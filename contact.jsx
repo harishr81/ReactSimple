@@ -109,6 +109,7 @@ onPhoneChange(e) {
         onChange={this.onSearchChange.bind(this)}/></td>
           
 		</tr>  
+		<br/>
          <tr>
             <th>contact Name</th>
             <th>contact Email</th>
@@ -117,7 +118,7 @@ onPhoneChange(e) {
 		 <tr><td></td></tr>
          <tr width="100%">
             <td>
-			<input style={{ marginLeft: "10px", width:"100px" }} 
+			<input style={{ marginLeft: "15px", width:"100px" }} 
         type='text' PlaceHolder='Enter Contactname'
         onChange={this.onChange.bind(this)}/></td>
            <td>
