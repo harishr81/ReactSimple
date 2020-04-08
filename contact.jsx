@@ -1,32 +1,21 @@
-import React from 'react';
+import React , { useState, useEffect  } from 'react';
 import ReactDOM from 'react-dom';
 import SearchTable from '../dist/reactable-search.js';
 import axios from 'axios';
 import _ from 'lodash';
 
-	
-class ContactTable extends React.Component {
-  constructor(props) {
-    super(props);
-	 this.mySubmitHandler = this.mySubmitHandler.bind(this);
-	 this.onSearchChange = this.onSearchChange.bind(this);
-	 this.state = { contactName: '' , contactEmail: '', contactPhone: '' , query: '', list : []};
-	 
-    
-	
-  }
-  
-  componentDidMount() {
-   //     this.searchContact(this.state.query);
-    }
-	
-	onSearchChange(e) {
-		 const responselist = [];
-		 this.setState({ query: e.target.value }, () => {
-            if (this.state.query && this.state.query.length > 1) {
-                console.log(this.state.query );
-				axios.get('http://localhost:8082/api/contactSearch?contactName=' +this.state.query)
-			.then(function (response ) {
+
+export const ContactTableWithHooks = () => {
+  const [input, setInput] =  React.useState("");
+  const [name, setName] =  React.useState("");
+  const [email, setEmail] =  React.useState("");
+  const [phone, setPhone] =  React.useState("");
+
+React.useEffect(() => {
+    console.log(input); 
+	const responselist = [];
+	axios.get('http://localhost:8085/api/contactSearch?contactName=' +input)
+            .then(function (response ) {
 			// handle success
 			responselist.push(response.data[0]);
 			 //this.setState({list: response.data[0] });
@@ -36,49 +25,16 @@ class ContactTable extends React.Component {
     // handle error
     console.log(error);
   })
-            }
-        })
-  this.setState({ list: responselist }, () => {
-	   console.log(this.state.list);
-  })
-   
-	};
+    }, [input]
 	
- onChange(e) {
-     this.setState({ contactName: e.target.value }, () => {
-            if (this.state.contactName && this.state.contactName.length > 1) {
-                console.log(this.state.contactName );
-            }
-        })
-   
-  };
+	
+	);
 
-
-onPhoneChange(e) {
-     this.setState({ contactPhone: e.target.value }, () => {
-            if (this.state.contactPhone && this.state.contactPhone.length > 1) {
-                console.log(this.state.contactPhone );
-            }
-        })
-   
-  };
-  
-  onEmailChange(e) {
-     this.setState({ contactEmail: e.target.value }, () => {
-            if (this.state.contactEmail && this.state.contactEmail.length > 1) {
-                console.log(this.state.contactEmail );
-            }
-        })
-   
-  };
-
- mySubmitHandler(event){
-    event.preventDefault();
-    //alert("You are submitting " + this.state.contactName +  this.state.contactPhone + this.state.contactEmail );
-	const contactInformation = {Name:this.state.contactName, Phone: this.state.contactPhone , Email: this.state.contactEmail};
-	console.log(contactInformation);
-	axios.post('http://localhost:8082/api/addContacts', {
-    Name:this.state.contactName , Phone: this.state.contactPhone , Email: this.state.contactEmail
+const handleSubmit = e => {
+    e.preventDefault();
+	console.log('Post');	
+	axios.post('http://localhost:8085/api/addContacts', {
+    Name:name, Phone: phone , Email: email
   })
   .then(function (response) {
     console.log(response);
@@ -87,28 +43,43 @@ onPhoneChange(e) {
   .catch(function (error) {
     console.log(error);
   });
-  }
- 
-      render() {
-        return (
-			<div>
-			
-		{this.state.list.map(item => (
-				 item.name
-        ))}
-    
+	
+    }
 
-             <form onSubmit={this.mySubmitHandler} >
-	  	
-	  <br/>
-         <table margin = "10px">
+
+   
+function onContactNameChange(e) {
+	
+	 console.log(e.target.value);
+	 setName(e.target.value);
+      
+  };
+  
+  function onEmailChange(e) {
+	 
+	 console.log(e.target.value);
+	 setEmail(e.target.value);
+     
+   
+  };
+
+  function onPhoneChange(e) {
+	 
+	console.log(e.target.value);
+	 setPhone(e.target.value);
+     
+   
+  };
+  return (
+    <form onSubmit = {handleSubmit}>
+	 <table margin = "10px">
 		 <tr width="100%">
             <td>
 			<input style={{ marginLeft: "10px", width:"100px" }} 
         type='text' PlaceHolder='Search Contacts'
-        onChange={this.onSearchChange.bind(this)}/></td>
-          
-		</tr>  
+        onChange={e => setInput(e.target.value)}/></td>
+        </tr>  
+
 		<br/>
          <tr>
             <th>contact Name</th>
@@ -119,27 +90,20 @@ onPhoneChange(e) {
          <tr width="100%">
             <td>
 			<input style={{ marginLeft: "15px", width:"100px" }} 
-        type='text' PlaceHolder='Enter Contactname'
-        onChange={this.onChange.bind(this)}/></td>
+        type='text' PlaceHolder='Enter Contactname' onChange={onContactNameChange} /></td>
            <td>
 			<input style={{ marginLeft: "20px", width:"100px" }} 
-        type='text' PlaceHolder='Enter ContactEmail'
-        onChange={this.onEmailChange.bind(this)}/></td>
+        type='text' PlaceHolder='Enter ContactEmail' onChange={onEmailChange} /></td>
        
             <td><input style={{ marginLeft: "30px", width:"100px" }} 
-        type='text' PlaceHolder='Enter ContactPhone'
-        onChange={this.onPhoneChange.bind(this)}/></td>
+        type='text' PlaceHolder='Enter ContactPhone' onChange={onPhoneChange} /></td>
        <td> 
       <input style={{ marginLeft: "40px" }}  type='submit'/></td>
-      
-         </tr>
-      </table>
-            </form>
-	</div>	
-			//{this.state.results}.map(element=> <ul><li>{element. name} </li></ul>))
-			
-    );
-  }
-};
+      </tr>
+	</table>
+	
+    </form>
+  )
+}
 
-ReactDOM.render(<ContactTable/>, document.getElementById('root'))
+ReactDOM.render(<ContactTableWithHooks/>, document.getElementById('root'))
